@@ -1,37 +1,22 @@
-name: Deploy to Hugging Face
+name: Sync to Hugging Face Space
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  sync-to-hub:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
 
       - name: Push to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_USERNAME: YOUR_HF_USERNAME
-          HF_SPACE: YOUR_SPACE_NAME
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-          git clone https://oauth2:${HF_TOKEN}@huggingface.co/spaces/huggermay3/ffmpeb hf-space
-
-          rsync -av --delete \
-            --exclude ".git" \
-            ./ hf-space/
-
-          cd hf-space
-
-          git add .
-
-          git diff --cached --quiet || git commit -m "Auto deploy from GitHub"
-
-          git push origin main
+          git push --force https://huggermay3:${HF_TOKEN}@huggingface.co/spaces/huggermay3/ffmped main
