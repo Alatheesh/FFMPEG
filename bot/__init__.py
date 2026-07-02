@@ -6,8 +6,13 @@ from bot import handlers
 
 def load_handlers():
     """
-    Automatically import every module inside bot/handlers/
+    Automatically import every module inside bot.handlers
+    including all subpackages.
     """
 
-    for _, module_name, _ in pkgutil.iter_modules(handlers.__path__):
-        importlib.import_module(f"bot.handlers.{module_name}")
+    for _, module_name, is_package in pkgutil.walk_packages(
+        handlers.__path__,
+        handlers.__name__ + "."
+    ):
+
+        importlib.import_module(module_name)
