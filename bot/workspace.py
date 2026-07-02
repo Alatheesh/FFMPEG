@@ -80,10 +80,10 @@ class Workspace:
 
     def set_main_video(self, asset):
 
-    if hasattr(asset, "id"):
-        self.video_asset = asset.id
-    else:
-        self.video_asset = asset
+        if hasattr(asset, "id"):
+            self.video_asset = asset.id
+        else:
+            self.video_asset = asset
 
     def get_main_video(self):
 
