@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+import sys
 
 from bot import load_handlers
 from bot.client import app
@@ -13,27 +14,86 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# ==================================================
+# Directories
+# ==================================================
+
 def create_directories():
-    for folder in [
+
+    for folder in (
         DOWNLOAD_DIR,
         OUTPUT_DIR,
         "logs",
-    ]:
-        os.makedirs(folder, exist_ok=True)
+    ):
+
+        os.makedirs(
+            folder,
+            exist_ok=True
+        )
 
 
-def main():
+# ==================================================
+# Startup
+# ==================================================
 
-    logger.info("Starting Telegram Media Editor...")
+def startup():
+
+    logger.info(
+        "=" * 60
+    )
+
+    logger.info(
+        "Starting Telegram Media Editor..."
+    )
 
     create_directories()
 
+    logger.info(
+        "Directories checked."
+    )
+
     load_handlers()
 
-    logger.info("Handlers loaded.")
+    logger.info(
+        "Handlers loaded."
+    )
 
-    app.run()
+    logger.info(
+        "Bot started successfully."
+    )
+
+    logger.info(
+        "=" * 60
+    )
+
+
+# ==================================================
+# Main
+# ==================================================
+
+def main():
+
+    try:
+
+        startup()
+
+        app.run()
+
+    except KeyboardInterrupt:
+
+        logger.info(
+            "Bot stopped by user."
+        )
+
+    except Exception:
+
+        logger.exception(
+            "Fatal startup error:"
+        )
+
+        sys.exit(1)
 
 
 if __name__ == "__main__":
+
     main()
