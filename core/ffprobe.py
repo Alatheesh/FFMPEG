@@ -2,58 +2,63 @@ import json
 import subprocess
 
 
-def probe(file_path: str):
-    """
-    Read media information using FFprobe.
-    Returns the complete JSON output.
-    """
+class FFProbe:
 
-    command = [
-        "ffprobe",
-        "-v", "quiet",
-        "-print_format", "json",
-        "-show_format",
-        "-show_streams",
-        file_path
-    ]
+    def __init__(self, ffprobe: str = "ffprobe"):
+        self.ffprobe = ffprobe
 
-    result = subprocess.run(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+    def probe(self, file_path: str):
 
-    return json.loads(result.stdout)
+        command = [
+            self.ffprobe,
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",
+            "-show_chapters",
+            file_path
+        ]
 
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
 
-def get_video_streams(info):
-    return [
-        s for s in info["streams"]
-        if s["codec_type"] == "video"
-    ]
+        if result.returncode != 0:
+            raise RuntimeError(result.stderr)
 
+        return json.loads(result.stdout)
 
-def get_audio_streams(info):
-    return [
-        s for s in info["streams"]
-        if s["codec_type"] == "audio"
-    ]
+    @staticmethod
+    def get_video_streams(info):
+        return [
+            s for s in info.get("streams", [])
+            if s.get("codec_type") == "video"
+        ]
 
+    @staticmethod
+    def get_audio_streams(info):
+        return [
+            s for s in info.get("streams", [])
+            if s.get("codec_type") == "audio"
+        ]
 
-def get_subtitle_streams(info):
-    return [
-        s for s in info["streams"]
-        if s["codec_type"] == "subtitle"
-    ]
+    @staticmethod
+    def get_subtitle_streams(info):
+        return [
+            s for s in info.get("streams", [])
+            if s.get("codec_type") == "subtitle"
+        ]
 
+    @staticmethod
+    def get_attachment_streams(info):
+        return [
+            s for s in info.get("streams", [])
+            if s.get("codec_type") == "attachment"
+        ]
 
-def get_attachment_streams(info):
-    return [
-        s for s in info["streams"]
-        if s["codec_type"] == "attachment"
-    ]
-
-
-def get_chapter_streams(info):
-    return info.get("chapters", [])
+    @staticmethod
+    def get_chapters(info):
+        return info.get("chapters", [])
