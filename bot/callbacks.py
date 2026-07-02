@@ -135,6 +135,21 @@ async def metadata(callback, ws, data):
 # ===================================================
 
 async def thumbnail(callback, ws, data):
+
+    if data.action == "upload":
+
+        ws.pending_action.set(
+            "thumbnail_upload"
+        )
+
+        await callback.message.reply_text(
+            "🖼 Send the thumbnail image."
+        )
+
+        await callback.answer()
+
+        return
+
     await callback.answer(
         f"Thumbnail: {data.action}"
     )
