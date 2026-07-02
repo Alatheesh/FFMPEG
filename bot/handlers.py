@@ -16,6 +16,7 @@ from models.media_asset import MediaAsset
 from models.asset_type import AssetType
 
 from core.ffprobe import FFProbe
+from config import DOWNLOAD_DIR
 
 probe=FFProbe()
 
@@ -172,33 +173,53 @@ async def video_handler(
     ):
 
         return
-
-    status=await message.reply_text(
+    status = await message.reply_text(
         "📥 Downloading..."
     )
 
-    download_path=await message.download()
+    download_path = await message.download(
+        file_name=DOWNLOAD_DIR
+    )
+
+    if download_path is None:
+
+        await status.edit_text(
+            "❌ Download failed."
+        )
+
+        return
+
+    if not os.path.exists(download_path):
+
+        await status.edit_text(
+            "❌ Downloaded file not found."
+        )
+
+        return
+
+    print(f"Downloaded File: {download_path}")
+    print(f"File Exists: {os.path.exists(download_path)}")
 
     await status.edit_text(
         "🔍 Reading media information..."
     )
 
-    metadata=await asyncio.to_thread(
+    metadata = await asyncio.to_thread(
         probe.probe,
         download_path
     )
 
-    user_id=message.from_user.id
+    user_id = message.from_user.id
 
-    ws=workspace.create(user_id)
+    ws = workspace.create(user_id)
 
-    asset=create_asset(
+    asset = create_asset(
         download_path,
         filename,
         media.file_size
     )
 
-    asset.metadata=metadata
+    asset.metadata = metadata
 
     ws.add_asset(asset)
 
