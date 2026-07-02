@@ -1,67 +1,121 @@
-from typing import Dict, Any
 import time
+from typing import Dict, Any
+
+from core.asset_manager import AssetManager
+
+
+class Workspace:
+
+    def __init__(self):
+
+        self.created_at = time.time()
+
+        # All uploaded assets
+        self.assets = AssetManager()
+
+        # Main working video asset id
+        self.video_asset = None
+
+        # Pending operations
+        self.pending_operations = []
+
+        # Output settings
+        self.output = {
+            "filename": None,
+            "container": None,
+            "directory": None
+        }
+
+        # User state
+        self.state = None
+
+        # Processing state
+        self.processing = False
+
+        # Progress
+        self.progress = 0
 
 
 class WorkspaceManager:
+
     def __init__(self):
-        self.workspaces: Dict[int, Dict[str, Any]] = {}
+
+        self.workspaces: Dict[int, Workspace] = {}
+
+    # --------------------------------
 
     def create(self, user_id: int):
-        self.workspaces[user_id] = {
-            "created_at": time.time(),
 
-            # Main video
-            "video": None,
+        workspace = Workspace()
 
-            # Uploaded resources
-            "assets": {
-                "audios": [],
-                "subtitles": [],
-                "thumbnail": None,
-                "fonts": [],
-                "attachments": []
-            },
+        self.workspaces[user_id] = workspace
 
-            # Operations waiting to be applied
-            "pending_operations": [],
+        return workspace
 
-            # Output settings
-            "output": {
-                "filename": None,
-                "container": None
-            },
-
-            # Current conversation state
-            "state": None
-        }
-
-    def exists(self, user_id: int):
-        return user_id in self.workspaces
+    # --------------------------------
 
     def get(self, user_id: int):
+
         return self.workspaces.get(user_id)
 
-    def set(self, user_id: int, key: str, value):
-        if not self.exists(user_id):
-            self.create(user_id)
+    # --------------------------------
 
-        self.workspaces[user_id][key] = value
+    def exists(self, user_id: int):
 
-    def add_audio(self, user_id: int, audio):
-        self.workspaces[user_id]["assets"]["audios"].append(audio)
+        return user_id in self.workspaces
 
-    def add_subtitle(self, user_id: int, subtitle):
-        self.workspaces[user_id]["assets"]["subtitles"].append(subtitle)
+    # --------------------------------
 
-    def set_thumbnail(self, user_id: int, thumbnail):
-        self.workspaces[user_id]["assets"]["thumbnail"] = thumbnail
+    def remove(self, user_id: int):
 
-    def add_operation(self, user_id: int, operation: dict):
-        self.workspaces[user_id]["pending_operations"].append(operation)
-
-    def clear(self, user_id: int):
         if user_id in self.workspaces:
             del self.workspaces[user_id]
+
+    # --------------------------------
+
+    def clear(self):
+
+        self.workspaces.clear()
+
+    # --------------------------------
+
+    def add_operation(self, user_id: int, operation):
+
+        workspace = self.get(user_id)
+
+        if workspace:
+            workspace.pending_operations.append(operation)
+
+    # --------------------------------
+
+    def operation_count(self, user_id: int):
+
+        workspace = self.get(user_id)
+
+        if workspace:
+            return len(workspace.pending_operations)
+
+        return 0
+
+    # --------------------------------
+
+    def set_main_video(self, user_id: int, asset_id: str):
+
+        workspace = self.get(user_id)
+
+        if workspace:
+            workspace.video_asset = asset_id
+
+    # --------------------------------
+
+    def get_main_video(self, user_id: int):
+
+        workspace = self.get(user_id)
+
+        if workspace:
+            return workspace.assets.get(workspace.video_asset)
+
+        return None
 
 
 workspace = WorkspaceManager()
