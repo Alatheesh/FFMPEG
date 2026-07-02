@@ -1,18 +1,9 @@
 import importlib
-import pkgutil
-
-from bot import handlers
 
 
 def load_handlers():
     """
-    Automatically import every module inside bot.handlers
-    including all subpackages.
+    Load the main handlers module.
     """
 
-    for _, module_name, is_package in pkgutil.walk_packages(
-        handlers.__path__,
-        handlers.__name__ + "."
-    ):
-
-        importlib.import_module(module_name)
+    importlib.import_module("bot.handlers")
