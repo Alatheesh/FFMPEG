@@ -1,0 +1,9 @@
+pyrogram
+tgcrypto
+motor
+python-dotenv
+pymediainfo
+aiofiles
+aiohttp
+requests
+psutil
