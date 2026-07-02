@@ -138,9 +138,9 @@ class Workspace:
         self.processing = False
         self.progress = 100
 
-   def reset_progress(self):
+    def reset_progress(self):
 
-    self.progress = 0
+        self.progress = 0
 
     def reset(self):
 
