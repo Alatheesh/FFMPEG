@@ -1,5 +1,6 @@
 import json
 import subprocess
+from pathlib import Path
 
 
 class FFProbe:
@@ -9,9 +10,12 @@ class FFProbe:
 
     def probe(self, file_path: str):
 
+        file_path = str(Path(file_path))
+
         command = [
             self.ffprobe,
-            "-v", "quiet",
+            "-hide_banner",
+            "-v", "error",
             "-print_format", "json",
             "-show_format",
             "-show_streams",
@@ -27,9 +31,55 @@ class FFProbe:
         )
 
         if result.returncode != 0:
-            raise RuntimeError(result.stderr)
+            raise RuntimeError(
+                f"""
+FFprobe execution failed.
 
-        return json.loads(result.stdout)
+File:
+{file_path}
+
+Command:
+{' '.join(command)}
+
+Return Code:
+{result.returncode}
+
+STDOUT:
+{result.stdout}
+
+STDERR:
+{result.stderr}
+"""
+            )
+
+        if not result.stdout.strip():
+            raise RuntimeError(
+                f"""
+FFprobe returned no output.
+
+File:
+{file_path}
+"""
+            )
+
+        try:
+            return json.loads(result.stdout)
+
+        except json.JSONDecodeError as e:
+            raise RuntimeError(
+                f"""
+Invalid JSON received from FFprobe.
+
+File:
+{file_path}
+
+STDOUT:
+{result.stdout}
+
+STDERR:
+{result.stderr}
+"""
+            ) from e
 
     @staticmethod
     def get_video_streams(info):
