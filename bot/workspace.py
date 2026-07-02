@@ -78,9 +78,12 @@ class Workspace:
     # Main Video
     # ==================================================
 
-    def set_main_video(self, asset_id: str):
+    def set_main_video(self, asset):
 
-        self.video_asset = asset_id
+    if hasattr(asset, "id"):
+        self.video_asset = asset.id
+    else:
+        self.video_asset = asset
 
     def get_main_video(self):
 
@@ -88,6 +91,38 @@ class Workspace:
             return None
 
         return self.assets.get(self.video_asset)
+
+    # ==================================================
+    # Assets
+    # ==================================================
+
+    def add_asset(self, asset):
+
+        return self.assets.add(asset)
+
+    def remove_asset(self, asset_id: str):
+
+        self.assets.remove(asset_id)
+
+    def get_asset(self, asset_id: str):
+
+        return self.assets.get(asset_id)
+
+    def get_assets(self):
+
+        return self.assets.all()
+
+    def get_assets_by_type(self, asset_type: str):
+
+        return self.assets.by_type(asset_type)
+
+    def asset_exists(self, asset_id: str):
+
+        return self.assets.exists(asset_id)
+
+    def asset_count(self):
+
+        return self.assets.count()
 
     # ==================================================
     # Processing
@@ -103,9 +138,9 @@ class Workspace:
         self.processing = False
         self.progress = 100
 
-    def reset_progress(self):
+   def reset(self):
 
-        self.progress = 0
+    self.clear()
 
     # ==================================================
     # Workspace
