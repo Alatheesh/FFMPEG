@@ -1,29 +1,27 @@
 FROM python:3.11-slim
 
-# Prevent Python from buffering logs
 ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
 
-# Set working directory
 WORKDIR /app
 
-# Install FFmpeg and MediaInfo
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     mediainfo \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (better Docker caching)
 COPY requirements.txt .
 
-# Install Python packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
 
-# Copy project files
+RUN pip install -r requirements.txt
+
 COPY . .
 
-# Create required folders
-RUN mkdir -p temp/downloads temp/outputs logs
+RUN mkdir -p \
+    temp/downloads \
+    temp/outputs \
+    logs
 
-# Start the bot
-CMD ["python", "start.py"]
+CMD ["python","start.py"]
