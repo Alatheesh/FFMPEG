@@ -29,3 +29,17 @@ MAX_FILE_SIZE = 20
 
 # Progress update interval (seconds)
 PROGRESS_UPDATE_TIME = 5
+
+# FFmpeg
+FFMPEG_BINARY = os.getenv("FFMPEG_BINARY", "ffmpeg")
+FFPROBE_BINARY = os.getenv("FFPROBE_BINARY", "ffprobe")
+
+# Logging
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+# Workspace
+WORKSPACE_TIMEOUT = 3600
+
+# Telegram
+WORKERS = 20
+SLEEP_THRESHOLD = 30
