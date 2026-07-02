@@ -472,7 +472,15 @@ async def upload_router(
 
         return
 
-    if pending=="replace_audio":
+    if pending is None:
+
+        await status.edit_text(
+            "❌ Unknown pending action."
+        )
+
+        return
+
+    if pending.action == "replace_audio":
 
         await receive_audio(
             ws,
@@ -480,7 +488,7 @@ async def upload_router(
             asset
         )
 
-    elif pending=="replace_subtitle":
+    elif pending.action == "replace_subtitle":
 
         await receive_subtitle(
             ws,
@@ -488,7 +496,7 @@ async def upload_router(
             asset
         )
 
-    elif pending=="replace_thumbnail":
+    elif pending.action == "thumbnail_upload":
 
         await receive_thumbnail(
             ws,
@@ -496,7 +504,7 @@ async def upload_router(
             asset
         )
 
-    elif pending=="upload_font":
+    elif pending.action == "upload_font":
 
         await receive_font(
             ws,
@@ -507,10 +515,12 @@ async def upload_router(
     else:
 
         await status.edit_text(
-            "❌ Unknown pending action."
+            f"❌ Unknown pending action: {pending.action}"
         )
 
         return
+
+    ws.pending_action.clear()
 
     await status.edit_text(
         "✅ File added successfully."
