@@ -1,9 +1,9 @@
 import os
 import logging
 
+from bot import load_handlers
+from bot.client import app
 from config import DOWNLOAD_DIR, OUTPUT_DIR
-
-# ---------------- Logging ---------------- #
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,31 +12,28 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# ------------- Create Folders ------------ #
 
 def create_directories():
-    folders = [
+    for folder in [
         DOWNLOAD_DIR,
         OUTPUT_DIR,
         "logs",
-    ]
-
-    for folder in folders:
+    ]:
         os.makedirs(folder, exist_ok=True)
 
-# ---------------- Main ------------------- #
 
 def main():
-    logger.info("========================================")
-    logger.info(" Telegram Media Editor Bot")
-    logger.info(" Initializing...")
-    logger.info("========================================")
+
+    logger.info("Starting Telegram Media Editor...")
 
     create_directories()
 
-    logger.info("✓ Required folders created.")
-    logger.info("✓ Configuration loaded.")
-    logger.info("✓ Ready for bot initialization.")
+    load_handlers()
+
+    logger.info("Handlers loaded.")
+
+    app.run()
+
 
 if __name__ == "__main__":
     main()
