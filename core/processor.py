@@ -1,4 +1,4 @@
-import os
+from typing import Callable, Dict
 
 from core.job_engine import JobEngine
 
@@ -9,20 +9,37 @@ class Processor:
         self.workspace = workspace
         self.engine = JobEngine()
 
-    def load_operations(self):
-        """
-        Load pending operations from the workspace.
-        """
+        self.handlers: Dict[str, Callable] = {}
 
+        self.register_default_handlers()
+
+    def register(self, operation: str, handler: Callable):
+        """
+        Register an operation handler.
+        """
+        self.handlers[operation] = handler
+
+    def register_default_handlers(self):
+
+        self.register("replace_audio", self.replace_audio)
+        self.register("merge_audio", self.merge_audio)
+        self.register("remove_audio", self.remove_audio)
+        self.register("swap_audio", self.swap_audio)
+        self.register("rename_audio", self.rename_audio)
+
+        self.register("add_subtitle", self.add_subtitle)
+        self.register("remove_subtitle", self.remove_subtitle)
+
+        self.register("change_thumbnail", self.change_thumbnail)
+        self.register("change_metadata", self.change_metadata)
+
+    def load_operations(self):
         self.engine.operations = self.workspace.get(
             "pending_operations",
             []
         )
 
     def process(self):
-        """
-        Execute every pending operation.
-        """
 
         self.load_operations()
 
@@ -34,38 +51,18 @@ class Processor:
             operation_type = operation["type"]
             data = operation["data"]
 
-            print(f"Running: {operation_type}")
+            handler = self.handlers.get(operation_type)
 
-            if operation_type == "replace_audio":
-                self.replace_audio(data)
-
-            elif operation_type == "merge_audio":
-                self.merge_audio(data)
-
-            elif operation_type == "remove_audio":
-                self.remove_audio(data)
-
-            elif operation_type == "swap_audio":
-                self.swap_audio(data)
-
-            elif operation_type == "rename_audio":
-                self.rename_audio(data)
-
-            elif operation_type == "add_subtitle":
-                self.add_subtitle(data)
-
-            elif operation_type == "remove_subtitle":
-                self.remove_subtitle(data)
-
-            elif operation_type == "change_thumbnail":
-                self.change_thumbnail(data)
-
-            elif operation_type == "change_metadata":
-                self.change_metadata(data)
+            if handler:
+                handler(data)
+            else:
+                print(f"Unknown operation: {operation_type}")
 
         return True
 
-    # ---------------- Audio ---------------- #
+    # ----------------------------------------------------
+    # AUDIO
+    # ----------------------------------------------------
 
     def replace_audio(self, data):
         pass
@@ -82,7 +79,9 @@ class Processor:
     def rename_audio(self, data):
         pass
 
-    # -------------- Subtitle --------------- #
+    # ----------------------------------------------------
+    # SUBTITLES
+    # ----------------------------------------------------
 
     def add_subtitle(self, data):
         pass
@@ -90,7 +89,9 @@ class Processor:
     def remove_subtitle(self, data):
         pass
 
-    # --------------- Others ---------------- #
+    # ----------------------------------------------------
+    # THUMBNAIL / METADATA
+    # ----------------------------------------------------
 
     def change_thumbnail(self, data):
         pass
