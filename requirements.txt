@@ -7,3 +7,6 @@ aiofiles
 aiohttp
 requests
 psutil
+
+Pillow
+orjson
