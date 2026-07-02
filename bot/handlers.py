@@ -178,7 +178,7 @@ async def video_handler(
     )
 
     download_path = await message.download(
-        file_name=DOWNLOAD_DIR
+        file_name=f"{DOWNLOAD_DIR}/{filename}"
     )
 
     if download_path is None:
