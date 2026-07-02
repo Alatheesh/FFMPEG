@@ -1305,19 +1305,3 @@ async def shutdown():
     for user_id in list(workspace.keys()):
 
         await cleanup_workspace(user_id)
-
-
-# ===========================================================
-# Global Error Handler
-# ===========================================================
-
-@app.on_errors()
-async def error_handler(
-    client,
-    update,
-    error
-):
-
-    print(error)
-
-    return True
