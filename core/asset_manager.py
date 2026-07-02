@@ -4,105 +4,234 @@ from models.media_asset import MediaAsset
 
 
 class AssetManager:
+    """
+    Central asset storage for one workspace.
+
+    Stores every uploaded media file including:
+    - Video
+    - Audio
+    - Subtitle
+    - Thumbnail
+    - Font
+    - Attachment
+    """
 
     def __init__(self):
+
         self.assets: Dict[str, MediaAsset] = {}
 
-    # ----------------------------------
+    # ==================================================
     # Add
-    # ----------------------------------
+    # ==================================================
 
-    def add(self, asset: MediaAsset):
+    def add(self, asset: MediaAsset) -> str:
 
         self.assets[asset.id] = asset
 
         return asset.id
 
-    # ----------------------------------
+    # ==================================================
     # Remove
-    # ----------------------------------
+    # ==================================================
 
     def remove(self, asset_id: str):
 
-        if asset_id in self.assets:
-            del self.assets[asset_id]
+        self.assets.pop(asset_id, None)
 
-    # ----------------------------------
+    # ==================================================
     # Get
-    # ----------------------------------
+    # ==================================================
 
     def get(self, asset_id: str) -> Optional[MediaAsset]:
 
         return self.assets.get(asset_id)
 
-    # ----------------------------------
+    # ==================================================
     # List
-    # ----------------------------------
+    # ==================================================
 
     def all(self) -> List[MediaAsset]:
 
         return list(self.assets.values())
 
-    # ----------------------------------
-    # Filter by type
-    # ----------------------------------
+    # ==================================================
+    # First Asset
+    # ==================================================
+
+    def first(self) -> Optional[MediaAsset]:
+
+        if not self.assets:
+            return None
+
+        return next(iter(self.assets.values()))
+
+    # ==================================================
+    # Last Asset
+    # ==================================================
+
+    def last(self) -> Optional[MediaAsset]:
+
+        if not self.assets:
+            return None
+
+        return list(self.assets.values())[-1]
+
+    # ==================================================
+    # Filter by Type
+    # ==================================================
 
     def by_type(self, asset_type: str) -> List[MediaAsset]:
 
         return [
+
             asset
+
             for asset in self.assets.values()
+
             if asset.type == asset_type
+
         ]
 
-    # ----------------------------------
-    # Count
-    # ----------------------------------
+    # ==================================================
+    # Find
+    # ==================================================
 
-    def count(self):
+    def find(self, filename: str) -> Optional[MediaAsset]:
 
-        return len(self.assets)
+        filename = filename.lower()
 
-    # ----------------------------------
+        for asset in self.assets.values():
+
+            if asset.name.lower() == filename:
+
+                return asset
+
+        return None
+
+    # ==================================================
     # Exists
-    # ----------------------------------
+    # ==================================================
 
-    def exists(self, asset_id: str):
+    def exists(self, asset_id: str) -> bool:
 
         return asset_id in self.assets
 
-    # ----------------------------------
+    # ==================================================
+    # Count
+    # ==================================================
+
+    def count(self) -> int:
+
+        return len(self.assets)
+
+    # ==================================================
+    # Empty
+    # ==================================================
+
+    def empty(self) -> bool:
+
+        return len(self.assets) == 0
+
+    # ==================================================
+    # Video
+    # ==================================================
+
+    def videos(self) -> List[MediaAsset]:
+
+        return self.by_type("video")
+
+    # ==================================================
+    # Audio
+    # ==================================================
+
+    def audios(self) -> List[MediaAsset]:
+
+        return self.by_type("audio")
+
+    # ==================================================
+    # Subtitle
+    # ==================================================
+
+    def subtitles(self) -> List[MediaAsset]:
+
+        return self.by_type("subtitle")
+
+    # ==================================================
+    # Thumbnail
+    # ==================================================
+
+    def thumbnails(self) -> List[MediaAsset]:
+
+        return self.by_type("thumbnail")
+
+    # ==================================================
+    # Font
+    # ==================================================
+
+    def fonts(self) -> List[MediaAsset]:
+
+        return self.by_type("font")
+
+    # ==================================================
+    # Attachment
+    # ==================================================
+
+    def attachments(self) -> List[MediaAsset]:
+
+        return self.by_type("attachment")
+
+    # ==================================================
+    # Summary
+    # ==================================================
+
+    def summary(self):
+
+        return {
+
+            "total": self.count(),
+
+            "videos": len(self.videos()),
+
+            "audios": len(self.audios()),
+
+            "subtitles": len(self.subtitles()),
+
+            "thumbnails": len(self.thumbnails()),
+
+            "fonts": len(self.fonts()),
+
+            "attachments": len(self.attachments())
+
+        }
+
+    # ==================================================
     # Clear
-    # ----------------------------------
+    # ==================================================
 
     def clear(self):
 
         self.assets.clear()
 
-    # ----------------------------------
-    # Find by filename
-    # ----------------------------------
+    # ==================================================
+    # Iterator
+    # ==================================================
 
-    def find(self, filename: str):
+    def __iter__(self):
 
-        for asset in self.assets.values():
+        return iter(self.assets.values())
 
-            if asset.name == filename:
-                return asset
+    # ==================================================
+    # Length
+    # ==================================================
 
-        return None
+    def __len__(self):
 
-    # ----------------------------------
-    # Summary
-    # ----------------------------------
+        return len(self.assets)
 
-    def summary(self):
+    # ==================================================
+    # Contains
+    # ==================================================
 
-        return {
-            "videos": len(self.by_type("video")),
-            "audios": len(self.by_type("audio")),
-            "subtitles": len(self.by_type("subtitle")),
-            "thumbnails": len(self.by_type("thumbnail")),
-            "fonts": len(self.by_type("font")),
-            "attachments": len(self.by_type("attachment"))
-        }
+    def __contains__(self, asset_id: str):
+
+        return asset_id in self.assets
