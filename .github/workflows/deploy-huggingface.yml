@@ -5,9 +5,14 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# ADD THIS BLOCK: It automatically cancels old queued runs when a new push happens.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sync-to-hub:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Make sure this is changed from ubuntu-latest!
 
     steps:
       - uses: actions/checkout@v4
