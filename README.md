@@ -1,9 +1,10 @@
 ---
-title: FFMPEG
-emoji: 🎬
+title: Auto Media Editor
+emoji: 🎥
 colorFrom: blue
-colorTo: red
+colorTo: indigo
 sdk: docker
 pinned: false
-license: mit
 ---
+
+Modular cloud-based media processing platform powered by Pyrogram and FFmpeg.
