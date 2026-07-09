@@ -5,9 +5,9 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, 
 from core.workspace import WorkspaceManager, MediaAsset, Operation
 from core.pipeline import FFmpegCompiler
 
-API_ID = int(os.environ.get("TELEGRAM_API_ID", "12345"))
-API_HASH = os.environ.get("TELEGRAM_API_HASH", "your_api_hash")
-BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "your_bot_token")
+API_ID = int(os.environ.get("TELEGRAM_API_ID", "27725592"))
+API_HASH = os.environ.get("TELEGRAM_API_HASH", "251ee09a3651d97f5fea5d0a2b7154b6")
+BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "6259120295:AAEbXCLsD_9PRUpblGrC7E6j40pTqsRpAyY")
 
 bot = Client("media_editor_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 manager = WorkspaceManager()
