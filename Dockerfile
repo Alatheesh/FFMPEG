@@ -1,27 +1,24 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
-ENV PYTHONUNBUFFERED=1
-ENV PIP_NO_CACHE_DIR=1
-
-WORKDIR /app
-
+# Install system dependencies and FFmpeg
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    mediainfo \
-    && apt-get clean \
+    git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Set up working directory
+WORKDIR /app
+
+# Copy requirements and install
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --upgrade pip
-
-RUN pip install -r requirements.txt
-
+# Copy application files
 COPY . .
 
-RUN mkdir -p \
-    temp/downloads \
-    temp/outputs \
-    logs
+# Create directory for local temp storage
+RUN mkdir -p /app/temp/downloads /app/temp/outputs && chmod -R 777 /app/temp
 
-CMD ["python","start.py"]
+# Run the Telegram client application
+CMD ["python", "main.py"]
