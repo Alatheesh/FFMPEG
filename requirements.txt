@@ -1,5 +1,6 @@
-pyrogram
-tgcrypto
+pyrogram==2.0.106
+tgcrypto==1.2.5
+pydantic==2.6.4
 motor
 python-dotenv
 pymediainfo
