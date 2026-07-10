@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(filters.command("start") & filters.private)
 async def start_command_handler(client: Client, message: Message):
+    if not message.from_user:
+        return
     user_id = message.from_user.id
     workspace = await get_workspace(user_id)
     
