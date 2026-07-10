@@ -29,11 +29,14 @@ def render_dashboard(workspace: Workspace, menu_name="main") -> tuple:
     video_asset = workspace.assets[workspace.main_video_id]
     meta = video_asset.metadata
     
+    # Extract filename outside f-string to avoid syntax error in Python < 3.12 (backslash in f-string)
+    video_filename = video_asset.file_path.split('/')[-1].split('\\')[-1]
+    
     # 1. Video Overview
     text = (
         "🎬 **Workspace Console**\n"
         "=========================\n"
-        f"📂 **File:** `{video_asset.file_path.split('/')[-1].split('\\')[-1]}`\n"
+        f"📂 **File:** `{video_filename}`\n"
         f"📊 **Size:** `{format_size(video_asset.file_size)}` | "
         f"⏱️ **Duration:** `{format_duration(meta.get('duration', 0.0))}`\n"
     )
