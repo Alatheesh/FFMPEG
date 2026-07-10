@@ -3,6 +3,7 @@ import logging
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from database import get_workspace, save_workspace
+from engine.models import Workspace
 from engine.ffprobe import run_ffprobe
 from bot.dashboard import render_dashboard
 from config import Config
