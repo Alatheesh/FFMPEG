@@ -10,17 +10,30 @@ from config import Config
 
 logger = logging.getLogger(__name__)
 
-@Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | filters.text))
+@Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | (filters.text & ~filters.command())))
 async def inputs_handler(client: Client, message: Message):
+    if not message.from_user:
+        return
     user_id = message.from_user.id
     workspace = await get_workspace(user_id)
     
     # 1. Initialize Main Video
+    is_video = False
+    file_obj = None
+    if message.video:
+        is_video = True
+        file_obj = message.video
+    elif message.document:
+        mime = message.document.mime_type or ""
+        name = message.document.file_name or ""
+        if "video" in mime or name.lower().endswith((".mp4", ".mkv", ".webm", ".avi", ".mov", ".3gp", ".flv")):
+            is_video = True
+            file_obj = message.document
+
     # If the user sends a video and there is no main video active in workspace
-    if (message.video or (message.document and message.document.mime_type and "video" in message.document.mime_type)) and not workspace.main_video_id:
+    if is_video and not workspace.main_video_id:
         loading = await message.reply_text("📥 **Downloading main video, please wait...**")
         
-        file_obj = message.video if message.video else message.document
         filename = file_obj.file_name or "video.mp4"
         dest_path = os.path.join(Config.DOWNLOADS_DIR, f"{user_id}_main_{filename}")
         
