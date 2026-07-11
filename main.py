@@ -46,7 +46,19 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Failed to delete webhook via HTTP request: {e}")
 
     logger.info("Starting Pyrogram bot client...")
-    await bot.start()
+    try:
+        await bot.start()
+    except Exception as e:
+        err_str = str(e)
+        if "AuthKeyInvalid" in err_str or "401" in err_str or "Unauthorized" in err_str:
+            logger.warning("Session file invalid or token revoked. Deleting session file and retrying...")
+            import os
+            session_file = "media_editor_bot.session"
+            if os.path.exists(session_file):
+                os.remove(session_file)
+            await bot.start()
+        else:
+            raise e
         
     try:
         bot_info = await bot.get_me()
