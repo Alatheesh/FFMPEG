@@ -3,14 +3,13 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from database import get_workspace, save_workspace
 from bot.dashboard import render_dashboard
-
 logger = logging.getLogger(__name__)
-
 @Client.on_message(filters.command("start") & filters.private)
 async def start_command_handler(client: Client, message: Message):
     if not message.from_user:
         return
     user_id = message.from_user.id
+    logger.info(f"Received /start command from user ID: {user_id}")
     workspace = await get_workspace(user_id)
     
     # Reset dashboard state if starting fresh
