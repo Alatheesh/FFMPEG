@@ -10,7 +10,7 @@ from config import Config
 
 logger = logging.getLogger(__name__)
 
-@Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | (filters.text & ~filters.command())))
+@Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | (filters.text & ~filters.regex(r"^/"))))
 async def inputs_handler(client: Client, message: Message):
     if not message.from_user:
         return
