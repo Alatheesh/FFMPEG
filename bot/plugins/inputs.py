@@ -7,14 +7,13 @@ from engine.models import Workspace
 from engine.ffprobe import run_ffprobe
 from bot.dashboard import render_dashboard
 from config import Config
-
 logger = logging.getLogger(__name__)
-
 @Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | (filters.text & ~filters.regex(r"^/"))))
 async def inputs_handler(client: Client, message: Message):
     if not message.from_user:
         return
     user_id = message.from_user.id
+    logger.info(f"Received input message from user ID {user_id} (Type: {message.media or 'text'})")
     workspace = await get_workspace(user_id)
     
     # 1. Initialize Main Video
@@ -29,7 +28,6 @@ async def inputs_handler(client: Client, message: Message):
         if "video" in mime or name.lower().endswith((".mp4", ".mkv", ".webm", ".avi", ".mov", ".3gp", ".flv")):
             is_video = True
             file_obj = message.document
-
     # If the user sends a video and there is no main video active in workspace
     if is_video and not workspace.main_video_id:
         loading = await message.reply_text("📥 **Downloading main video, please wait...**")
@@ -76,12 +74,10 @@ async def inputs_handler(client: Client, message: Message):
             logger.error(f"Failed to initialize video: {e}")
             await loading.edit_text(f"❌ Failed to download and initialize video: `{e}`")
             return
-
     # If workspace is not initialized and they send other inputs, guide them
     if not workspace.main_video_id:
         await message.reply_text("👋 **Auto Media Editor**\n\nPlease upload a video file to initialize your workspace console first.")
         return
-
     # 2. Process Pending Action Inputs
     pending = workspace.pending_action
     if not pending:
@@ -172,7 +168,6 @@ async def inputs_handler(client: Client, message: Message):
             await update_dashboard(client, workspace)
         except Exception as e:
             await loading.edit_text(f"❌ Failed: `{e}`")
-
     # --- Text Input Action Handling ---
     elif message.text:
         text = message.text.strip()
@@ -235,9 +230,7 @@ async def inputs_handler(client: Client, message: Message):
             await save_workspace(workspace)
             await message.reply_text("✅ Video trim range added to operation pipeline!")
             await update_dashboard(client, workspace)
-
 import re
-
 async def update_dashboard(client: Client, workspace: Workspace):
     if not workspace.dashboard_message_id:
         return
