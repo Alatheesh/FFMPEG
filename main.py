@@ -5,6 +5,7 @@ from pyrogram import Client
 from config import Config
 from database import init_db
 import uvicorn
+import aiohttp
 
 # Setup logging
 logging.basicConfig(
@@ -34,13 +35,18 @@ async def lifespan(app: FastAPI):
     if not db_success:
         logger.error("Failed to connect database, starting in fallback memory-only mode.")
         
+    # Delete webhook via Telegram Bot API directly using aiohttp to clear any active webhooks
+    try:
+        async with aiohttp.ClientSession() as session:
+            url = f"https://api.telegram.org/bot{Config.BOT_TOKEN}/deleteWebhook?drop_pending_updates=true"
+            async with session.get(url) as response:
+                resp_text = await response.text()
+                logger.info(f"Telegram Webhook Delete Response: {resp_text}")
+    except Exception as e:
+        logger.warning(f"Failed to delete webhook via HTTP request: {e}")
+
     logger.info("Starting Pyrogram bot client...")
     await bot.start()
-    try:
-        await bot.delete_webhook(drop_pending_updates=True)
-        logger.info("Deleted any existing webhooks and dropped pending updates.")
-    except Exception as e:
-        logger.warning(f"Failed to delete webhook: {e}")
         
     try:
         bot_info = await bot.get_me()
