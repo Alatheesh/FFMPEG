@@ -37,6 +37,12 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Pyrogram bot client...")
     await bot.start()
     try:
+        await bot.delete_webhook(drop_pending_updates=True)
+        logger.info("Deleted any existing webhooks and dropped pending updates.")
+    except Exception as e:
+        logger.warning(f"Failed to delete webhook: {e}")
+        
+    try:
         bot_info = await bot.get_me()
         logger.info(f"Bot @{bot_info.username} started successfully.")
     except Exception as e:
