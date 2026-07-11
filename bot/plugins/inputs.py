@@ -8,7 +8,7 @@ from engine.ffprobe import run_ffprobe
 from bot.dashboard import render_dashboard
 from config import Config
 logger = logging.getLogger(__name__)
-@Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | (filters.text & ~filters.regex(r"^/"))))
+@Client.on_message(filters.private & (filters.video | filters.document | filters.audio | filters.photo | (filters.text & ~filters.command)))
 async def inputs_handler(client: Client, message: Message):
     if not message.from_user:
         return
